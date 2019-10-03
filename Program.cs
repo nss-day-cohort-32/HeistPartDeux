@@ -9,15 +9,15 @@ namespace HeistClassical
     {
         static void Main(string[] args)
         {
-            var roladex = new List<IRobber>();
+            var rolodex = CreateStartingRolodex();
 
             while (true)
             {
-                var robber = CollectRobberInfo();
+                var robber = CollectRobberInfo(rolodex.Count);
 
                 if (robber == null)break;
 
-                roladex.Add(robber);
+                rolodex.Add(robber);
             }
 
             var bank = CreateRandomBank();
@@ -28,7 +28,7 @@ namespace HeistClassical
 
             while (true)
             {
-                var recruit = CollectRoladexMember(roladex, crew);
+                var recruit = CollectRolodexMember(rolodex, crew);
 
                 if (recruit == null)break;
 
@@ -54,18 +54,20 @@ namespace HeistClassical
             Console.WriteLine(resultMessage);
         }
 
-        private static IRobber CollectRoladexMember(List<IRobber> roladex, List<IRobber> crew)
+        private static IRobber CollectRolodexMember(List<IRobber> rolodex, List<IRobber> crew)
         {
             var availableCut = 100 - crew.Aggregate(0, (total, member) => member.PercentageCut + total);
-            var options = roladex.Where(x =>
+            var options = rolodex.Where(x =>
             {
                 return !crew.Contains(x) && x.PercentageCut <= availableCut;
             });
 
+            Console.WriteLine($"Available Percentage: {availableCut}");
+
             var index = -1;
             while (index < 0 || index >= options.Count())
             {
-                Console.WriteLine($"Choose a crew member (1-{options.Count()})");
+                Console.WriteLine($"Choose a crew member (1-{options.Count()} or <Enter> to begin the heist)");
 
                 for (int i = 0; i < options.Count(); i++)
                 {
@@ -118,10 +120,11 @@ namespace HeistClassical
             Console.WriteLine($"Least Secure: {leastSecure}");
         }
 
-        private static IRobber CollectRobberInfo()
+        private static IRobber CollectRobberInfo(int rolodexCount)
         {
             Console.Clear();
-            Console.WriteLine("Enter the name of a contact");
+            Console.WriteLine($"Currently {rolodexCount} contacts in your rolodex");
+            Console.WriteLine("Enter the name of a contact. (Press <Enter> to continue)");
             var name = Prompt();
 
             if (String.IsNullOrWhiteSpace(name))return null;
@@ -185,6 +188,55 @@ namespace HeistClassical
                 default:
                     return null;
             }
+        }
+
+        private static List<IRobber> CreateStartingRolodex()
+        {
+            return new List<IRobber>
+            {
+                new Hacker
+                {
+                    Name = "Mr. White",
+                        SkillLevel = 40,
+                        PercentageCut = 20
+                },
+                new Hacker
+                {
+                    Name = "Mr. Gray",
+                        SkillLevel = 60,
+                        PercentageCut = 25
+                },
+                new LockPickSpecialist
+                {
+                    Name = "Mr. Pink",
+                        SkillLevel = 95,
+                        PercentageCut = 50
+                },
+                new LockPickSpecialist
+                {
+                    Name = "Mr. Red",
+                        SkillLevel = 60,
+                        PercentageCut = 20
+                },
+                new LockPickSpecialist
+                {
+                    Name = "Mr. Orange",
+                        SkillLevel = 20,
+                        PercentageCut = 10
+                },
+                new Muscle
+                {
+                    Name = "Mr. Blue",
+                        SkillLevel = 95,
+                        PercentageCut = 50
+                },
+                new Muscle
+                {
+                    Name = "Mr. Blue",
+                        SkillLevel = 50,
+                        PercentageCut = 20
+                }
+            };
         }
 
         private static string Prompt()
