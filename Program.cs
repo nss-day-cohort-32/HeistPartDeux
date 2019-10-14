@@ -15,7 +15,7 @@ namespace HeistClassical
             {
                 var robber = CollectRobberInfo(rolodex.Count);
 
-                if (robber == null)break;
+                if (robber == null) break;
 
                 rolodex.Add(robber);
             }
@@ -30,7 +30,7 @@ namespace HeistClassical
             {
                 var recruit = CollectRolodexMember(rolodex, crew);
 
-                if (recruit == null)break;
+                if (recruit == null) break;
 
                 crew.Add(recruit);
             }
@@ -52,6 +52,21 @@ namespace HeistClassical
                 "Successfully robbed the bank!";
 
             Console.WriteLine(resultMessage);
+
+            if (!bank.IsSecure) PrintPayoutReport(bank, robbers);
+        }
+
+        private static void PrintPayoutReport(Bank bank, List<IRobber> robbers)
+        {
+            Console.WriteLine($"${bank.CashOnHand} stolen from the vault\n\n");
+            robbers.ForEach(r =>
+            {
+                var robberTake = bank.CashOnHand * (r.PercentageCut / (double)100);
+                Console.WriteLine($"{r.Name}: ${robberTake:f2}");
+            });
+            var usersPercentage = (100 - robbers.Select(r => r.PercentageCut).Sum());
+            var usersTake = bank.CashOnHand * (usersPercentage / (double)100);
+            Console.WriteLine($"You: ${usersTake:f2}");
         }
 
         private static IRobber CollectRolodexMember(List<IRobber> rolodex, List<IRobber> crew)
@@ -72,12 +87,12 @@ namespace HeistClassical
                 for (int i = 0; i < options.Count(); i++)
                 {
                     var option = options.ElementAt(i);
-                    Console.WriteLine($"{i+1}. {option.Name} [{option.SkillLevel}% {option.SpecialtyName}]: {option.PercentageCut}% Cut");
+                    Console.WriteLine($"{i + 1}. {option.Name} [{option.SkillLevel}% {option.SpecialtyName}]: {option.PercentageCut}% Cut");
                 }
 
                 var indexString = Prompt();
 
-                if (string.IsNullOrWhiteSpace(indexString))return null;
+                if (string.IsNullOrWhiteSpace(indexString)) return null;
 
                 int.TryParse(indexString, out index);
 
@@ -94,8 +109,9 @@ namespace HeistClassical
             return new Bank
             {
                 AlarmScore = rand.Next(1, 100),
-                    SecurityGaurdScore = rand.Next(1, 100),
-                    VaultScore = rand.Next(1, 100)
+                SecurityGaurdScore = rand.Next(1, 100),
+                VaultScore = rand.Next(1, 100),
+                CashOnHand = rand.Next(20_000, 1_000_000)
             };
         }
 
@@ -107,12 +123,12 @@ namespace HeistClassical
             string mostSecure;
             string leastSecure;
 
-            if (als >= sgs && als >= vs)mostSecure = "Alarm";
-            else if (sgs >= als && sgs >= vs)mostSecure = "Security Guards";
+            if (als >= sgs && als >= vs) mostSecure = "Alarm";
+            else if (sgs >= als && sgs >= vs) mostSecure = "Security Guards";
             else mostSecure = "Vault";
 
-            if (als <= sgs && als <= vs)leastSecure = "Alarm";
-            else if (sgs <= als && sgs <= vs)leastSecure = "Security Guards";
+            if (als <= sgs && als <= vs) leastSecure = "Alarm";
+            else if (sgs <= als && sgs <= vs) leastSecure = "Security Guards";
             else leastSecure = "Vault";
 
             Console.WriteLine("Bank Recon Report:");
@@ -127,7 +143,7 @@ namespace HeistClassical
             Console.WriteLine("Enter the name of a contact. (Press <Enter> to continue)");
             var name = Prompt();
 
-            if (String.IsNullOrWhiteSpace(name))return null;
+            if (String.IsNullOrWhiteSpace(name)) return null;
 
             var specialty = 0;
             while (specialty < 1 || specialty > 3)
@@ -168,22 +184,22 @@ namespace HeistClassical
                     return new Hacker
                     {
                         Name = name,
-                            SkillLevel = skillLevel,
-                            PercentageCut = cut
+                        SkillLevel = skillLevel,
+                        PercentageCut = cut
                     };
                 case 2:
                     return new Muscle
                     {
                         Name = name,
-                            SkillLevel = skillLevel,
-                            PercentageCut = cut
+                        SkillLevel = skillLevel,
+                        PercentageCut = cut
                     };
                 case 3:
                     return new LockPickSpecialist
                     {
                         Name = name,
-                            SkillLevel = skillLevel,
-                            PercentageCut = cut
+                        SkillLevel = skillLevel,
+                        PercentageCut = cut
                     };
                 default:
                     return null;
